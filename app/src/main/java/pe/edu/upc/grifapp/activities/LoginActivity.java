@@ -5,29 +5,16 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,17 +29,9 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
 import pe.edu.upc.grifapp.R;
 import pe.edu.upc.grifapp.models.Login;
-import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.LoginApi;
-import pe.edu.upc.grifapp.network.UsersApi;
-
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
@@ -117,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void registrarUsuario(View v) {
-        Intent intent = new Intent(this, RegisterActivity.class);
+        Intent intent = new Intent(this, UserRegisterActivity.class);
         startActivityForResult(intent, REQUEST_SIGNUP);
     }
 
@@ -169,11 +148,13 @@ public class LoginActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                login = User.build(response);
+                                login = Login.build(response);
 
                                 if (login.getCode().equals("0")) {
-
+                                    progressDialog.dismiss();
+                                    onLoginSuccess(login.getToken());
                                 }else{
+                                    progressDialog.dismiss();
                                     Snackbar.make(linearLayout, login.getMessage(), Snackbar.LENGTH_LONG).show();
                                 }
                                 // sourcesAdapter.setSources(sources);
@@ -261,23 +242,19 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-                Snackbar.make(linearLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_SIGNUP) {
+//            if (resultCode == RESULT_OK) {
+//                Snackbar.make(linearLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
+//            }
+//        }
+//    }
 
-    public void onLoginSuccess(JSONObject responseJson) {
+    public void onLoginSuccess(String token) {
         //mLoginButton.setEnabled(true);
-        Intent intent = new Intent(this, RegisterActivity.class);
-        try {
-            intent.putExtra("Dni",responseJson.get("Codigocliente").toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Intent intent = new Intent(this, UserRegisterActivity.class);
+        intent.putExtra("token",token);
         startActivity(intent);
         finish();
     }

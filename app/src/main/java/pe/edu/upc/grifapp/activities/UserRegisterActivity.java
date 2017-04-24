@@ -1,13 +1,10 @@
 package pe.edu.upc.grifapp.activities;
 
 import android.app.ProgressDialog;
-import android.renderscript.RenderScript;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,16 +17,12 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.xml.transform.Source;
-
 import pe.edu.upc.grifapp.R;
 import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.UsersApi;
 
-public class RegisterActivity extends AppCompatActivity {
+public class UserRegisterActivity extends AppCompatActivity {
 
     private EditText txtNombre;
     private EditText txtApellido;
@@ -43,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_user_register);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutRegister);
@@ -68,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         final String email = txtEmail.getText().toString();
         final String password = txtPassword.getText().toString();
-        final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this,R.style.AppTheme_Dark_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(UserRegisterActivity.this,R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Registrando usuario...");
         progressDialog.show();
