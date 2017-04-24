@@ -31,9 +31,13 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +47,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pe.edu.upc.grifapp.R;
+import pe.edu.upc.grifapp.models.Login;
+import pe.edu.upc.grifapp.models.User;
+import pe.edu.upc.grifapp.network.LoginApi;
+import pe.edu.upc.grifapp.network.UsersApi;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -58,7 +66,9 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputLayout textInputLayout;
     private View mProgressView;
     private View mLoginFormView;
-    //private CoordinatorLayout coordinatorLayout;
+    private LinearLayout linearLayout;
+    private static String TAG = "GrifApp";
+    private Login login;
     //private GoogleApiClient client;
     //private Button mLoginButton;
 
@@ -68,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         //getSupportActionBar().hide();
 
-        //coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        linearLayout = (LinearLayout) findViewById(R.id.coordinatorLayout);
 
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         textInputLayout = (TextInputLayout) findViewById(R.id.tilInputPassword);
@@ -123,26 +133,6 @@ public class LoginActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        //if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-        if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_field_required));
-            //textInputLayout.setError(getString(R.string.error_field_required));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -150,6 +140,62 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+
+            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+                    R.style.AppTheme_Dark_Dialog);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage("Autenticando...");
+            progressDialog.show();
+
+            JSONObject loginJson = new JSONObject();
+            try {
+                loginJson.put("email", email);
+                loginJson.put("password", password);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            AndroidNetworking.post(LoginApi.LOGIN_URL)
+                    .addJSONObjectBody(loginJson)
+                    .setPriority(Priority.HIGH)
+                    .setTag(TAG)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                if(!response.getString("code").equals("0")) {
+                                    Snackbar.make(linearLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                login = User.build(response);
+
+                                if (login.getCode().equals("0")) {
+
+                                }else{
+                                    Snackbar.make(linearLayout, login.getMessage(), Snackbar.LENGTH_LONG).show();
+                                }
+                                // sourcesAdapter.setSources(sources);
+                                // sourcesAdapter.notifyDataSetChanged();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {
+                            String messageError = "Error en aplicativo";
+                            try {
+                                JSONObject jsonBody = new JSONObject(anError.getErrorBody());
+                                messageError = jsonBody.getString("message");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            progressDialog.dismiss();
+                            Snackbar.make(linearLayout, messageError, Snackbar.LENGTH_LONG).show();
+                        }
+                    });
 
             /*
             showProgress(true);
@@ -215,43 +261,25 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isEmailValid(String email) {
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-                //this.finish();
-                //Snackbar.make(coordinatorLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(linearLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
             }
         }
     }
 
     public void onLoginSuccess(JSONObject responseJson) {
         //mLoginButton.setEnabled(true);
-//        Intent intent = new Intent(this, MovimientoActivity.class);
-//        try {
-//            intent.putExtra("Dni",responseJson.get("Codigocliente").toString());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        startActivity(intent);
+        Intent intent = new Intent(this, RegisterActivity.class);
+        try {
+            intent.putExtra("Dni",responseJson.get("Codigocliente").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        startActivity(intent);
         finish();
-    }
-
-    public void errorConexion(){
-        //Snackbar.make(coordinatorLayout, "Problema con el servicio web", Snackbar.LENGTH_LONG).show();
-    }
-
-    public void onLoginFailed() {
-        //Toast.makeText(getBaseContext(), "Usuario incorrecto", Toast.LENGTH_LONG).show();
-        //Snackbar.make(coordinatorLayout, "Email no registrado", Snackbar.LENGTH_LONG).show();
     }
 
     /**

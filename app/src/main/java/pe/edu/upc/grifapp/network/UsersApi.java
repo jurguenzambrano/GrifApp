@@ -8,7 +8,6 @@ import pe.edu.upc.grifapp.models.User;
 
 public class UsersApi {
     public static String USERS_URL = "http://api.fuel.maraquya.com/users";
-    public static String ARTICLES_URL = "https://newsapi.org/v1/articles";
     private User currentUser;
 
     public User getCurrentUser() {

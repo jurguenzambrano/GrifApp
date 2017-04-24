@@ -49,13 +49,14 @@ public class User {
         return this;
     }
 
-    public static Login build(JSONObject jsonArticle) {
-        if(jsonArticle == null) return null;
+    public static Login build(JSONObject jsonLogin) {
+        if(jsonLogin == null) return null;
         Login login = new Login();
         try {
-            login.setCode(jsonArticle.getString("code"))
-                    .setMessage(jsonArticle.getString("message"))
-                    .setToken(jsonArticle.getString("token"));
+            login.setCode(jsonLogin.getString("code"))
+                    .setMessage(jsonLogin.getString("message"));
+            JSONObject uniObject = jsonLogin.getJSONObject("data");
+            login.setToken(uniObject.getString("token"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

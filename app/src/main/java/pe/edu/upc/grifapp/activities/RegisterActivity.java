@@ -60,10 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
                 registrarUsuario();
             }
         });
-
     }
-
-
 
     private void registrarUsuario() {
         txtNombre.setError(null);
@@ -71,40 +68,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         final String email = txtEmail.getText().toString();
         final String password = txtPassword.getText().toString();
-/*
-        if (txtNombre.getText().toString().isEmpty()){
-            txtNombre.setError(getString(R.string.error_field_required));
-            txtNombre.requestFocus();
-            return;
-        }
-
-        if (txtApellido.getText().toString().isEmpty()){
-            txtApellido.setError(getString(R.string.error_field_required));
-            txtApellido.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(email)) {
-            txtEmail.setError(getString(R.string.error_field_required));
-            txtEmail.requestFocus();
-            return;
-        } else if (!isEmailValid(email)) {
-            txtEmail.setError(getString(R.string.error_invalid_email));
-            txtEmail.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            txtPassword.setError(getString(R.string.error_field_required));
-            txtPassword.requestFocus();
-            return;
-        }
-*/
         final ProgressDialog progressDialog = new ProgressDialog(RegisterActivity.this,R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Registrando usuario...");
         progressDialog.show();
-
 
         JSONObject userJson = new JSONObject();
         try {
@@ -125,14 +92,15 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            if(response.getString("status").equalsIgnoreCase("error")) {
-                                Log.d(TAG, response.getString("message"));
+                            if(!response.getString("code").equals("0")) {
+                                Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
                                 return;
                             }
 
                             login = User.build(response);
 
                             if (login.getCode().equals("0")) {
+                                progressDialog.dismiss();
                                 setResult(RESULT_OK);
                                 finish();
                             }else{
@@ -143,79 +111,26 @@ public class RegisterActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-
                     }
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.d(TAG, anError.getLocalizedMessage());
+                        String messageError = "Error en aplicativo";
+                        try {
+                            JSONObject jsonBody = new JSONObject(anError.getErrorBody());
+                            messageError = jsonBody.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         progressDialog.dismiss();
+                        Snackbar.make(coordinatorLayout, messageError, Snackbar.LENGTH_LONG).show();
                     }
                 });
-        /*
-        AsyncHttpClient client = new AsyncHttpClient();
-        JSONObject jsonParams = new JSONObject();
-        try {
-            jsonParams.put("Apellidos", txtApellido.getText().toString());
-            jsonParams.put("Celular", txtCelular.getText().toString());
-            jsonParams.put("Direccion", txtDireccion.getText().toString());
-            jsonParams.put("Dni", txtDni.getText().toString());
-            jsonParams.put("Mail", txtEmail.getText().toString());
-            jsonParams.put("Nombres", txtNombre.getText().toString());
-            jsonParams.put("Clave", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        StringEntity entity = null;
-        try {
-            entity = new StringEntity(jsonParams.toString());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        UsuarioRestClient.post(RegisterActivity.this, "usuarios", entity, "application/json", new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                todoOk();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                try {
-                    String mensaje = new String(responseBody, "UTF-8");
-                    txtDni.requestFocus();
-                    Snackbar.make(coordinatorLayout, mensaje, Snackbar.LENGTH_LONG).show();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                progressDialog.dismiss();
-            }
-        });
-        */
-    }
-
-    private void maximoRegistro(){
-        Snackbar.make(coordinatorLayout, "Se superó el máximo de cuentas por DNI (3)", Snackbar.LENGTH_LONG).show();
-    }
-
-    private void errorConexionRegistro(){
-        Snackbar.make(coordinatorLayout, "Error al realizar conexión", Snackbar.LENGTH_LONG).show();
     }
 
     private void todoOk(){
         setResult(RESULT_OK);
         finish();
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
 }
