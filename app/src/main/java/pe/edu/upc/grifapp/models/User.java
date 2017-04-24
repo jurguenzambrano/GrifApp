@@ -61,4 +61,23 @@ public class User {
         }
         return login;
     }
+
+    public static User user(JSONObject jsonUser) {
+        try {
+            if(jsonUser == null || jsonUser.getInt("code") != 0) {
+                return null;
+            }
+
+            User user = new User();
+            user.setEmail(jsonUser.getJSONObject("data").getString("email"))
+                .setName(jsonUser.getJSONObject("data").getString("name"))
+                .setLastName(jsonUser.getJSONObject("data").getString("last_name"));
+
+            return user;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
