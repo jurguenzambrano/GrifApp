@@ -3,14 +3,25 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Iniciar sesión</string>
+    <string name="register">No tienes cuenta! Crea una</string>
+    <string name="action_sign_in_short">Iniciar</string>
+    <string name="error_invalid_email">El correo es inválido</string>
+    <string name="error_invalid_password">Ingrese password</string>
     <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="error_field_required">Campo obligatorio</string>
+
+    <!-- String Formulario Registro -->
+    <string name="fNombre">Nombres</string>
+    <string name="fApellidos">Apellidos</string>
+    <string name="fDni">DNI</string>
+    <string name="fFechaEmision">Fecha de Emisión</string>
+    <string name="fDireccion">Dirección</string>
+    <string name="fFechaNacimiento">Fecha de Nacimiento</string>
+    <string name="fCelular">Celular</string>
+    <string name="fEmail">Email</string>
+    <string name="fPassword">Password</string>
+    <string name="fRepitePassword">Repite Password</string>
+
 </resources>

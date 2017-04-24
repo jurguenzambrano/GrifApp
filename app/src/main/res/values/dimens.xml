@@ -2,4 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="textoTitulo">18dp</dimen>
+    <dimen name="textoNormal">16dp</dimen>
+
+    <!-- diseño -->
+    <dimen name="elevacion_actionbar">4dp</dimen>
+    <dimen name="separacion_horizontal">1dp</dimen>
 </resources>
