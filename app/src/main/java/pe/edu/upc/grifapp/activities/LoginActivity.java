@@ -253,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess(String token) {
         //mLoginButton.setEnabled(true);
-        Intent intent = new Intent(this, UserRegisterActivity.class);
+        Intent intent = new Intent(this, WelcomeActivity.class);
         intent.putExtra("token",token);
         startActivity(intent);
         finish();
