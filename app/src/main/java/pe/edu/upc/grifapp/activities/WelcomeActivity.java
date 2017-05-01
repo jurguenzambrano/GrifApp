@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import pe.edu.upc.grifapp.GrifApp;
 import pe.edu.upc.grifapp.R;
+import pe.edu.upc.grifapp.models.Fuel;
 import pe.edu.upc.grifapp.models.User;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -16,6 +19,7 @@ public class WelcomeActivity extends AppCompatActivity {
     ImageView imageViewPromotions;
     ImageView imageViewLocations;
     User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
