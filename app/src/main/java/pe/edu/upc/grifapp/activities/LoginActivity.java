@@ -29,9 +29,12 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pe.edu.upc.grifapp.GrifApp;
 import pe.edu.upc.grifapp.R;
 import pe.edu.upc.grifapp.models.Login;
-import pe.edu.upc.grifapp.network.LoginApi;
+import pe.edu.upc.grifapp.models.Message;
+import pe.edu.upc.grifapp.models.User;
+import pe.edu.upc.grifapp.network.*;
 
 /**
  * A login screen that offers login via email/password.
@@ -48,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private static String TAG = "GrifApp";
     private Login login;
+    private User user;
+    private Message message;
     //private GoogleApiClient client;
     //private Button mLoginButton;
 
@@ -101,162 +106,137 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void attemptLogin() {
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
         final String email = mEmailView.getText().toString();
         final String password = mPasswordView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+        //loginCorrecto = false;
+        mEmailView.setError(null);
+        mPasswordView.setError(null);
 
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+        // Show a progress spinner, and kick off a background task to
+        // perform the user login attempt.
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Autenticando...");
+        progressDialog.show();
 
-            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Autenticando...");
-            progressDialog.show();
+        JSONObject loginJson = new JSONObject();
+        try {
+            loginJson.put("email", email);
+            loginJson.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-            JSONObject loginJson = new JSONObject();
-            try {
-                loginJson.put("email", email);
-                loginJson.put("password", password);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            AndroidNetworking.post(LoginApi.LOGIN_URL)
-                    .addJSONObjectBody(loginJson)
-                    .setPriority(Priority.HIGH)
-                    .setTag(TAG)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                if(!response.getString("code").equals("0")) {
-                                    Snackbar.make(linearLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
-                                    return;
-                                }
-
-                                login = Login.build(response);
-
-                                if (login.getCode().equals("0")) {
-                                    progressDialog.dismiss();
-                                    onLoginSuccess(login.getToken());
-                                }else{
-                                    progressDialog.dismiss();
-                                    Snackbar.make(linearLayout, login.getMessage(), Snackbar.LENGTH_LONG).show();
-                                }
-                                // sourcesAdapter.setSources(sources);
-                                // sourcesAdapter.notifyDataSetChanged();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+        AndroidNetworking.post(LoginApi.LOGIN_URL)
+                .addJSONObjectBody(loginJson)
+                .setPriority(Priority.HIGH)
+                .setTag(TAG)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(!response.getString("code").equals("0")) {
+                                Snackbar.make(linearLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
+                                return;
                             }
-                        }
 
-                        @Override
-                        public void onError(ANError anError) {
-                            String messageError = "Error en aplicativo";
-                            try {
-                                JSONObject jsonBody = new JSONObject(anError.getErrorBody());
-                                messageError = jsonBody.getString("message");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            message = Message.build(response);
+                            login = Login.build(response.getJSONObject("data"));
+
                             progressDialog.dismiss();
-                            Snackbar.make(linearLayout, messageError, Snackbar.LENGTH_LONG).show();
+                            if (message.getCode().equals("0")) {
+                                onLoginSuccess();
+                            }else{
+                                Snackbar.make(linearLayout, message.getMessage(), Snackbar.LENGTH_LONG).show();
+                            }
+                            // sourcesAdapter.setSources(sources);
+                            // sourcesAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    });
-
-            /*
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
-            */
-
-            //mLoginButton.setEnabled(false);
-
-            /*
-            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Autenticando...");
-            progressDialog.show();
-
-            AsyncHttpClient client = new AsyncHttpClient();
-            JSONObject jsonParams = new JSONObject();
-            try {
-                jsonParams.put("Mail", email);
-                jsonParams.put("Clave", password);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            StringEntity entity = null;
-            try {
-                entity = new StringEntity(jsonParams.toString());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-
-            LoginRestClient.post(LoginActivity.this, "accesos", entity, "application/json", new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    JSONObject jObject = null;
-                    try {
-                        String mensaje = new String(responseBody, "UTF-8");
-                        jObject = new JSONObject(mensaje);
-                        System.out.println(jObject.get("Codigocliente"));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                    progressDialog.dismiss();
-                    onLoginSuccess(jObject);
-                }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    try {
-                        String mensaje = new String(responseBody, "UTF-8");
-                        mPasswordView.requestFocus();
-                        System.out.println(mensaje);
-                        Snackbar.make(coordinatorLayout, mensaje, Snackbar.LENGTH_LONG).show();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                    @Override
+                    public void onError(ANError anError) {
+                        String messageError = "Error en aplicativo";
+                        try {
+                            JSONObject jsonBody = new JSONObject(anError.getErrorBody());
+                            messageError = jsonBody.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        progressDialog.dismiss();
+                        Snackbar.make(linearLayout, messageError, Snackbar.LENGTH_LONG).show();
                     }
-                    progressDialog.dismiss();
-                }
-            });
-            */
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SIGNUP) {
+            if (resultCode == RESULT_OK) {
+                Snackbar.make(linearLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_SIGNUP) {
-//            if (resultCode == RESULT_OK) {
-//                Snackbar.make(linearLayout, "Usuario registrado", Snackbar.LENGTH_LONG).show();
-//            }
-//        }
-//    }
-//
-    public void onLoginSuccess(String token) {
-        //mLoginButton.setEnabled(true);
-        Intent intent = new Intent(this, WelcomeActivity.class);
-        intent.putExtra("token",token);
-        startActivity(intent);
-        finish();
+    public void onLoginSuccess() {
+
+        // Obtenemos los datos del usuario
+        AndroidNetworking.get(UsersApi.USERS_URL + "/" + login.getId())
+                .addHeaders("token",login.getToken())
+                .setPriority(Priority.HIGH)
+                .setTag(TAG)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(!response.getString("code").equals("0")) {
+                                Snackbar.make(linearLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            message = Message.build(response);
+                            user = User.build(response.getJSONObject("data"));
+
+                            if (message.getCode().equals("0")) {
+                                // Asignamos los datos del login
+                                GrifApp.getInstance().setCurrentLogin(login);
+                                // Asignamos los datos del user
+                                GrifApp.getInstance().setCurrentUser(user);
+                                // Si todo esta ok, abrimos la pantalla de Bienvenida
+                                Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
+                                //intent.putExtra("token",login.getToken());
+                                startActivity(intent);
+                                finish();
+                            }else{
+                                Snackbar.make(linearLayout, message.getMessage(), Snackbar.LENGTH_LONG).show();
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        String messageError = "Error en aplicativo";
+                        try {
+                            JSONObject jsonBody = new JSONObject(anError.getErrorBody());
+                            messageError = jsonBody.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Snackbar.make(linearLayout, messageError, Snackbar.LENGTH_LONG).show();
+                        return;
+                    }
+                });
     }
 
     /**

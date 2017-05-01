@@ -8,27 +8,8 @@ import org.json.JSONObject;
  */
 
 public class Login {
-    String message;
-    String code;
     String token;
-
-    public String getMessage() {
-        return message;
-    }
-
-    public Login setMessage(String message) {
-        this.message = message;
-        return this;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public Login setCode(String code) {
-        this.code = code;
-        return this;
-    }
+    String id;
 
     public String getToken() {
         return token;
@@ -39,14 +20,20 @@ public class Login {
         return this;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Login setId(String id) {
+        this.id = id;
+        return this;
+    }
+
     public static Login build(JSONObject jsonLogin) {
         if(jsonLogin == null) return null;
         Login login = new Login();
         try {
-            login.setCode(jsonLogin.getString("code"))
-                    .setMessage(jsonLogin.getString("message"));
-            JSONObject uniObject = jsonLogin.getJSONObject("data");
-            login.setToken(uniObject.getString("token"));
+            login.setToken(jsonLogin.getString("token")).setId(jsonLogin.getString("id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

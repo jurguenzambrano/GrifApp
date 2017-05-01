@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 import pe.edu.upc.grifapp.R;
 import pe.edu.upc.grifapp.models.Login;
-import pe.edu.upc.grifapp.models.User;
+import pe.edu.upc.grifapp.models.Message;
 import pe.edu.upc.grifapp.network.UsersApi;
 
 public class UserRegisterActivity extends AppCompatActivity {
@@ -32,6 +32,7 @@ public class UserRegisterActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private static String TAG = "GrifApp";
     private Login login;
+    private Message message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +91,15 @@ public class UserRegisterActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            login = User.build(response);
+                            message = Message.build(response);
+                            login = Login.build(response.getJSONObject("data"));
 
-                            if (login.getCode().equals("0")) {
+                            if (message.getCode().equals("0")) {
                                 progressDialog.dismiss();
                                 setResult(RESULT_OK);
                                 finish();
                             }else{
-                                Snackbar.make(coordinatorLayout, login.getMessage(), Snackbar.LENGTH_LONG).show();
+                                Snackbar.make(coordinatorLayout, message.getMessage(), Snackbar.LENGTH_LONG).show();
                             }
                             // sourcesAdapter.setSources(sources);
                             // sourcesAdapter.notifyDataSetChanged();

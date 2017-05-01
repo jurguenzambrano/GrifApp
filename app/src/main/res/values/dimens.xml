@@ -9,4 +9,5 @@
     <!-- diseño -->
     <dimen name="elevacion_actionbar">4dp</dimen>
     <dimen name="separacion_horizontal">1dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
