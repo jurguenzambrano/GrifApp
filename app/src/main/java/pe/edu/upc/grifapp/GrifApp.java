@@ -4,7 +4,9 @@ import android.app.Application;
 
 import com.androidnetworking.AndroidNetworking;
 
+import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.User;
+import pe.edu.upc.grifapp.network.LoginApi;
 import pe.edu.upc.grifapp.network.UsersApi;
 
 /**
@@ -15,6 +17,7 @@ public class GrifApp extends Application {
     // Singleton Pattern Implementation
     private static GrifApp instance;
     UsersApi usersApi = new UsersApi();
+    LoginApi loginApi = new LoginApi();
 
     public GrifApp() {
         super();
@@ -41,12 +44,8 @@ public class GrifApp extends Application {
         return usersApi.getCurrentUser();
     }
 
-//    public void setCurrentArticle(Article article) {
-//        newsApi.setCurrentArticle(article);
-//    }
-//
-//    public Article getCurrentArticle() {
-//        return newsApi.getCurrentArticle();
-//    }
+    public void setCurrentLogin(Login login) { loginApi.setCurrentLogin(login); }
+
+    public Login getCurrentLogin() { return loginApi.getCurrentLogin(); }
 
 }

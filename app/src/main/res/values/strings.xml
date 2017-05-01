@@ -24,4 +24,7 @@
     <string name="fPassword">Password</string>
     <string name="fRepitePassword">Repite Password</string>
 
+    <!-- Mensajes -->
+    <string name="mHello">Hola</string>
+    <string name="mWelcome">Bienvenido a </string>
 </resources>
