@@ -25,4 +25,7 @@
     <string name="fRepitePassword">Repite Password</string>
     <string name="title_activity_fuel_station">FuelStationActivity</string>
 
+    <!-- Mensajes -->
+    <string name="mHello">Hola</string>
+    <string name="mWelcome">Bienvenido a </string>
 </resources>

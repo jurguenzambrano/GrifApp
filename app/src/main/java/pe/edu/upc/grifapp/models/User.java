@@ -8,6 +8,7 @@ import org.json.JSONObject;
  */
 
 public class User {
+    String id;
     String email;
     String password;
     String name;
@@ -49,7 +50,17 @@ public class User {
         return this;
     }
 
-    public static Login build(JSONObject jsonLogin) {
+    public String getId() {
+        return id;
+    }
+
+    public User setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+
+/*    public static Login builNewUser(JSONObject jsonLogin) {
         if(jsonLogin == null) return null;
         Login login = new Login();
         try {
@@ -61,18 +72,19 @@ public class User {
             e.printStackTrace();
         }
         return login;
-    }
+    }*/
 
-    public static User user(JSONObject jsonUser) {
+    public static User build(JSONObject jsonUser) {
         try {
-            if(jsonUser == null || jsonUser.getInt("code") != 0) {
+            if(jsonUser == null) {
                 return null;
             }
 
             User user = new User();
-            user.setEmail(jsonUser.getJSONObject("data").getString("email"))
-                .setName(jsonUser.getJSONObject("data").getString("name"))
-                .setLastName(jsonUser.getJSONObject("data").getString("last_name"));
+            user.setEmail(jsonUser.getString("email"))
+                .setName(jsonUser.getString("name"))
+                .setLastName(jsonUser.getString("last_name"))
+                .setId(jsonUser.getString("id"));
 
             return user;
         } catch (JSONException e) {
@@ -81,4 +93,24 @@ public class User {
 
         return null;
     }
+/*
+    public static User user(JSONObject jsonUser) {
+        try {
+            if(jsonUser == null || jsonUser.getInt("code") != 0) {
+                return null;
+            }
+
+            User user = new User();
+            user.setEmail(jsonUser.getJSONObject("data").getString("email"))
+                    .setName(jsonUser.getJSONObject("data").getString("name"))
+                    .setLastName(jsonUser.getJSONObject("data").getString("last_name"));
+
+            return user;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    */
 }
