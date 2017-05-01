@@ -10,7 +10,7 @@ import android.view.View;
 import pe.edu.upc.grifapp.R;
 
 public class FuelStationActivity extends AppCompatActivity {
-
+String test;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
