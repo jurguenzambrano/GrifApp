@@ -58,7 +58,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.PromotionsActivity" />
         </activity>
-        <activity android:name=".activities.UserUpdateActivity"></activity>
+        <activity android:name=".activities.UserUpdateActivity"
+            android:parentActivityName=".activities.WelcomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.WelcomeActivity" />
+        </activity>
     </application>
 
 </manifest>
