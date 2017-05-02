@@ -80,21 +80,20 @@ public class Fuel {
     public static Fuel build(JSONObject jsonFuel) {
         if(jsonFuel == null) return null;
         Fuel source = new Fuel();
-        try {
+        try {/*
             int length = jsonFuel.getJSONArray("sortBysAvailable").length();
             List<String> sortBysAvailable = new ArrayList<>();
             for(int i = 0; i < length; i++) {
                 sortBysAvailable.add(
                         jsonFuel.getJSONArray("sortBysAvailable")
                                 .getString(i));
-            }
+            }*/
             source.setId(jsonFuel.getString("id"))
                     .setName(jsonFuel.getString("name"))
                     .setLatitude(jsonFuel.getString("latitude"))
                     .setAltitude(jsonFuel.getString("altitude"))
                     .setAddress(jsonFuel.getString("address"))
-                    .setType(jsonFuel.getString("type"))
-                    .setSortBysAvailable(sortBysAvailable);
+                    .setType(jsonFuel.getString("type"));
 
         } catch (JSONException e) {
             e.printStackTrace();

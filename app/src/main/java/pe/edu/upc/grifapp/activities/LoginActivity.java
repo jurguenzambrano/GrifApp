@@ -210,7 +210,7 @@ public class LoginActivity extends AppCompatActivity {
                                 // Asignamos los datos del user
                                 GrifApp.getInstance().setCurrentUser(user);
                                 // Si todo esta ok, abrimos la pantalla de Bienvenida
-                                Intent intent = new Intent(getBaseContext(), UserUpdateActivity.class);
+                                Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
                                 //intent.putExtra("token",login.getToken());
                                 startActivity(intent);
                                 finish();

@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.androidnetworking.AndroidNetworking;
 
+import pe.edu.upc.grifapp.models.Location;
 import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.LoginApi;
@@ -18,6 +19,7 @@ public class GrifApp extends Application {
     private static GrifApp instance;
     UsersApi usersApi = new UsersApi();
     LoginApi loginApi = new LoginApi();
+    Location currentLocation = new Location();
 
     public GrifApp() {
         super();
@@ -47,5 +49,9 @@ public class GrifApp extends Application {
     public void setCurrentLogin(Login login) { loginApi.setCurrentLogin(login); }
 
     public Login getCurrentLogin() { return loginApi.getCurrentLogin(); }
+
+    public Location getCurrentLocation(){return currentLocation;}
+
+    public void setCurrentLocation(Location location){ currentLocation = location;}
 
 }

@@ -1,7 +1,9 @@
 package pe.edu.upc.grifapp.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +37,19 @@ public class WelcomeActivity extends AppCompatActivity {
         mHello.setText(getString(R.string.mHello) + " " + user.getName());
         mWelcome.setText(getString(R.string.mWelcome) + " " + getString(R.string.app_name));
 
-        
+        imageViewLocations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onViewMap();
+            }
+        });
 
+    }
+
+    public void onViewMap(){
+        Intent intent = new Intent(this, FuelStationActivity.class);
+        //intent.putExtra("altitud",customer.getAltitud());
+        //intent.putExtra("latitud",customer.getLatitud());
+        startActivity(intent);
     }
 }

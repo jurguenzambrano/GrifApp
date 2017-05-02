@@ -7,7 +7,7 @@ import pe.edu.upc.grifapp.models.Fuel;
  */
 
 public class FuelStationApi {
-    public static String FUEL_URL = "http://api.fuel.maraquya.com/fuel";
+    public static String FUEL_URL = "http://apigrifapp.apphb.com/FuelStationServices.svc/fuelstations";
     /*
     public Fuel fuel;
 
