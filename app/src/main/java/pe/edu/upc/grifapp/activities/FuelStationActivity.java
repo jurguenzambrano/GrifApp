@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -41,8 +43,8 @@ import pe.edu.upc.grifapp.network.FuelStationApi;
 public class FuelStationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static String TAG = "GrifApp";
-    User user;
-    Login login;
+    private User user;
+    private Login login;
     List<Fuel> fuels;
 
     final static int PERMISSIONS_REQUEST_ACCESS_LOCATION = 100;
@@ -57,13 +59,14 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fuel_station);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         fuels = new ArrayList<Fuel>();
 
         user = GrifApp.getInstance().getCurrentUser();
         login = GrifApp.getInstance().getCurrentLogin();
-
-        setupLocationUpdates();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_container);
         mapFragment.getMapAsync(this);
@@ -94,6 +97,7 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
                                     .position(estacion)
                                     .title(fuels.get(i).getName()));
                         }
+                        setupLocationUpdates();
                     }
 
                     @Override
@@ -139,7 +143,11 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
             }
             locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
             location = locationManager.getLastKnownLocation(locationProvider);
-            refreshCurrentLocation(location);
+            if (location == null){
+                Toast.makeText(this, "Error al obtener GPS", Toast.LENGTH_SHORT).show();
+            }else {
+                refreshCurrentLocation(location);
+            }
         }
     }
 

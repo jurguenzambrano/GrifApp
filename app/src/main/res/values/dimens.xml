@@ -10,4 +10,10 @@
     <dimen name="elevacion_actionbar">4dp</dimen>
     <dimen name="separacion_horizontal">1dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="margin_default">15dp</dimen>
+    <dimen name="image_grid_height">120dp</dimen>
+    <dimen name="image_about_height">220dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
+    <dimen name="corner_radius">4dp</dimen>
 </resources>

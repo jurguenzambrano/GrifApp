@@ -17,7 +17,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBZV1hN6QaIDyfnuZwE0dLl2cop42CiAE4" />
@@ -32,8 +31,32 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.UserRegisterActivity" />
-        <activity android:name=".activities.WelcomeActivity"></activity>
-        <activity android:name=".activities.FuelStationActivity"></activity>
+        <activity android:name=".activities.WelcomeActivity" />
+        <activity android:name=".activities.FuelStationActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.WelcomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.WelcomeActivity" />
+        </activity>
+        <activity
+            android:name=".activities.PromotionsActivity"
+            android:label="@string/title_activity_promotions"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.WelcomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.WelcomeActivity" />
+        </activity>
+        <activity
+            android:name=".activities.PromotionActivity"
+            android:label="@string/title_activity_promotion"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.PromotionsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.PromotionsActivity" />
+        </activity>
     </application>
 
 </manifest>

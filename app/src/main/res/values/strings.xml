@@ -28,4 +28,6 @@
     <!-- Mensajes -->
     <string name="mHello">Hola</string>
     <string name="mWelcome">Bienvenido a </string>
+    <string name="title_activity_promotions">PromotionsActivity</string>
+    <string name="title_activity_promotion">PromotionActivity</string>
 </resources>

@@ -44,12 +44,22 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
+        imageViewPromotions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onViewPromotions();
+            }
+        });
+
     }
 
     public void onViewMap(){
         Intent intent = new Intent(this, FuelStationActivity.class);
-        //intent.putExtra("altitud",customer.getAltitud());
-        //intent.putExtra("latitud",customer.getLatitud());
+        startActivity(intent);
+    }
+
+    public void onViewPromotions(){
+        Intent intent = new Intent(this, PromotionsActivity.class);
         startActivity(intent);
     }
 }
