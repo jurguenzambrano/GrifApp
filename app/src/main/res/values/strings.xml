@@ -25,6 +25,12 @@
     <string name="fRepitePassword">Repite Password</string>
     <string name="title_activity_fuel_station">FuelStationActivity</string>
 
+    <string name="textTemperatura">Temperatura</string>
+    <string name="textHumedad">Humedad</string>
+    <string name="textPresion">Presión</string>
+    <string name="textTemperaturaMin">Temperatura Mínima</string>
+    <string name="textTemperaturaMax">Temperatura Máxima</string>
+
     <!-- Mensajes -->
     <string name="mHello">Hola</string>
     <string name="mWelcome">Bienvenido a </string>

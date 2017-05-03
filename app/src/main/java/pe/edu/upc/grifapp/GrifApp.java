@@ -41,19 +41,6 @@ public class GrifApp extends com.orm.SugarApp {
     }
 
     // Delegate Pattern Implementation
-
-//    public void setCurrentUser(User User) {
-//        usersApi.setCurrentUser(User);
-//    }
-//
-//    public User getCurrentUser() {
-//        return usersApi.getCurrentUser();
-//    }
-//
-//    public void setCurrentLogin(Login login) { loginApi.setCurrentLogin(login); }
-//
-//    public Login getCurrentLogin() { return loginApi.getCurrentLogin(); }
-
     public void setCurrentPromotion(Promotion promotion){ promotionsApi.setCurrentPromotion(promotion);}
 
     public Promotion getCurrentPromotion(){return promotionsApi.getCurrentPromotion();}

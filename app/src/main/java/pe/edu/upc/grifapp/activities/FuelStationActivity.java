@@ -3,11 +3,15 @@ package pe.edu.upc.grifapp.activities;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,12 +23,17 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -41,7 +50,7 @@ import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.FuelStationApi;
 
-public class FuelStationActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class FuelStationActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
     private static String TAG = "GrifApp";
     private User user;
@@ -55,6 +64,7 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
     private LocationListener locationListener;
     private Location location;
     private GoogleMap map;
+    private Marker mCurrLocationMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +73,7 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        locationListener = this;
         fuels = new ArrayList<Fuel>();
 
         user = ((GrifApp)getApplication()).getGrifAppService().getLastUser();
@@ -71,7 +81,28 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_container);
         mapFragment.getMapAsync(this);
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        /*
+        //stop location updates when Activity is no longer active
+        if (mGoogleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+                    //removeLocationUpdates(mGoogleApiClient, locationListener);
+        }
+        */
+    }
+
+    protected void onStart() {
+        //mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        //mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
@@ -102,9 +133,9 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
                             LatLng estacion = new LatLng(Double.parseDouble(fuels.get(i).getAltitude()),Double.parseDouble(fuels.get(i).getLatitude()));
                             googleMap.addMarker(new MarkerOptions()
                                     .position(estacion)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_grifapp))
                                     .title(fuels.get(i).getName()));
                         }
-                        setupLocationUpdates();
                         progressDialog.dismiss();
                     }
 
@@ -122,28 +153,13 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
                         return;
                     }
                 });
-
+        setupLocationUpdates();
     }
 
     private void setupLocationUpdates() {
         validatePermissions();
         if (locationPermissionGranted) {
             locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-            locationListener = new LocationListener() {
-                public void onLocationChanged(Location location) {
-                    refreshCurrentLocation(location);
-                }
-
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                }
-
-                public void onProviderEnabled(String provider) {
-                }
-
-                public void onProviderDisabled(String provider) {
-                }
-            };
             if (ActivityCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this,
@@ -151,6 +167,7 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
                 return;
             }
             locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
+
             location = locationManager.getLastKnownLocation(locationProvider);
             if (location == null){
                 Toast.makeText(this, "Error al obtener datos del GPS", Toast.LENGTH_LONG).show();
@@ -175,16 +192,55 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
     }
 
     private void refreshCurrentLocation(Location location) {
-        String locationDescription = "======================> Latitude: " + String.valueOf(location.getLatitude()) + " Longitude: " + String.valueOf(location.getLongitude());
-        Log.d(TAG, locationDescription);
+        if (location == null) {
+        }else{
+            String locationDescription = "======================> Latitude: " + String.valueOf(location.getLatitude()) + " Longitude: " + String.valueOf(location.getLongitude());
+            Log.d(TAG, locationDescription);
 
-        LatLng currentLocation = new LatLng(location.getLatitude(),location.getLongitude());
-        CameraPosition cameraPosition = CameraPosition.builder()
-                .target(currentLocation)
-                .zoom(16)
-                .build();
-        map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            if (mCurrLocationMarker != null) {
+                mCurrLocationMarker.remove();
+            }
 
+            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(currentLocation);
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_position));
+            mCurrLocationMarker = map.addMarker(markerOptions);
+            CameraPosition cameraPosition = CameraPosition.builder()
+                    .target(currentLocation)
+                    .zoom(16)
+                    .build();
+            map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        refreshCurrentLocation(location);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
+        Toast.makeText(getBaseContext(), "Gps is turned off!! ", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshCurrentLocation(location);
     }
 
 }
