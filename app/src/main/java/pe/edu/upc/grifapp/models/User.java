@@ -1,5 +1,7 @@
 package pe.edu.upc.grifapp.models;
 
+import com.orm.SugarRecord;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -7,8 +9,8 @@ import org.json.JSONObject;
  * Created by Jurguen Zambrano on 22/04/2017.
  */
 
-public class User {
-    String id;
+public class User extends SugarRecord{
+    Long id;
     String email;
     String password;
     String name;
@@ -50,13 +52,12 @@ public class User {
         return this;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public User setId(String id) {
+    public void setId(Long id) {
         this.id = id;
-        return this;
     }
 
 
@@ -84,7 +85,7 @@ public class User {
             user.setEmail(jsonUser.getString("email"))
                 .setName(jsonUser.getString("name"))
                 .setLastName(jsonUser.getString("last_name"))
-                .setId(jsonUser.getString("id"));
+                .setId(jsonUser.getLong("id"));
 
             return user;
         } catch (JSONException e) {

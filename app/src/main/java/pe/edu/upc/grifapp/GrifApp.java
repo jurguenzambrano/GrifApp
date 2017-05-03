@@ -11,18 +11,19 @@ import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.LoginApi;
 import pe.edu.upc.grifapp.network.PromotionsApi;
 import pe.edu.upc.grifapp.network.UsersApi;
+import pe.edu.upc.grifapp.service.GrifAppService;
 
 /**
  * Created by Jurguen Zambrano on 22/04/2017.
  */
 
-public class GrifApp extends Application {
+public class GrifApp extends com.orm.SugarApp {
     // Singleton Pattern Implementation
     private static GrifApp instance;
     private UsersApi usersApi = new UsersApi();
     private LoginApi loginApi = new LoginApi();
     private PromotionsApi promotionsApi = new PromotionsApi();
-    //private Promotion currentPromotion = new Promotion();
+    private GrifAppService grifAppService = new GrifAppService();
 
     public GrifApp() {
         super();
@@ -41,20 +42,24 @@ public class GrifApp extends Application {
 
     // Delegate Pattern Implementation
 
-    public void setCurrentUser(User User) {
-        usersApi.setCurrentUser(User);
-    }
-
-    public User getCurrentUser() {
-        return usersApi.getCurrentUser();
-    }
-
-    public void setCurrentLogin(Login login) { loginApi.setCurrentLogin(login); }
-
-    public Login getCurrentLogin() { return loginApi.getCurrentLogin(); }
+//    public void setCurrentUser(User User) {
+//        usersApi.setCurrentUser(User);
+//    }
+//
+//    public User getCurrentUser() {
+//        return usersApi.getCurrentUser();
+//    }
+//
+//    public void setCurrentLogin(Login login) { loginApi.setCurrentLogin(login); }
+//
+//    public Login getCurrentLogin() { return loginApi.getCurrentLogin(); }
 
     public void setCurrentPromotion(Promotion promotion){ promotionsApi.setCurrentPromotion(promotion);}
 
     public Promotion getCurrentPromotion(){return promotionsApi.getCurrentPromotion();}
+
+    public GrifAppService getGrifAppService() {return grifAppService;}
+
+    public void setGrifAppService(GrifAppService grifAppService){ this.grifAppService = grifAppService; }
 
 }

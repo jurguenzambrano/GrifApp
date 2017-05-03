@@ -35,6 +35,7 @@ import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.Message;
 import pe.edu.upc.grifapp.models.User;
 import pe.edu.upc.grifapp.network.*;
+import pe.edu.upc.grifapp.service.GrifAppService;
 
 /**
  * A login screen that offers login via email/password.
@@ -53,8 +54,6 @@ public class LoginActivity extends AppCompatActivity {
     private Login login;
     private User user;
     private Message message;
-    //private GoogleApiClient client;
-    //private Button mLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,42 +61,46 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         //getSupportActionBar().hide();
 
-        linearLayout = (LinearLayout) findViewById(R.id.coordinatorLayout);
+        // Valida si el usuario ya se encuentra conectado
+        login = ((GrifApp)getApplication()).getGrifAppService().getLastLogin();
 
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        textInputLayout = (TextInputLayout) findViewById(R.id.tilInputPassword);
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.password || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+        if (login == null){
+            linearLayout = (LinearLayout) findViewById(R.id.coordinatorLayout);
+
+            mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+            textInputLayout = (TextInputLayout) findViewById(R.id.tilInputPassword);
+            mPasswordView = (EditText) findViewById(R.id.password);
+            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    if (id == R.id.password || id == EditorInfo.IME_NULL) {
+                        attemptLogin();
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                return false;
-            }
-        });
+            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    return false;
+                }
+            });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+            Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+            mEmailSignInButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptLogin();
+                }
+            });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        //mProgressView = findViewById(R.id.login_progress);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+            mLoginFormView = findViewById(R.id.login_form);
+        }else {
+            onLoginSuccess();
+        }
+
     }
 
     public void registrarUsuario(View v) {
@@ -205,10 +208,9 @@ public class LoginActivity extends AppCompatActivity {
                             user = User.build(response.getJSONObject("data"));
 
                             if (message.getCode().equals("0")) {
-                                // Asignamos los datos del login
-                                GrifApp.getInstance().setCurrentLogin(login);
-                                // Asignamos los datos del user
-                                GrifApp.getInstance().setCurrentUser(user);
+                                login.save();
+                                //User userFind = User.findById(user.getId());
+                                user.update();
                                 // Si todo esta ok, abrimos la pantalla de Bienvenida
                                 Intent intent = new Intent(getBaseContext(), WelcomeActivity.class);
                                 //intent.putExtra("token",login.getToken());
@@ -239,40 +241,10 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //refreshDashboard();
     }
-}
 
+}

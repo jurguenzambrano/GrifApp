@@ -5,6 +5,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,8 +39,9 @@ public class UserUpdateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_update);
-        user = GrifApp.getInstance().getCurrentUser();
-        login = GrifApp.getInstance().getCurrentLogin();
+
+        user = ((GrifApp)getApplication()).getGrifAppService().getLastUser();
+        login = ((GrifApp)getApplication()).getGrifAppService().getLastLogin();
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutUpdate);
 
         txtName = (EditText) findViewById(R.id.in_name);
@@ -85,14 +87,9 @@ public class UserUpdateActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            progressDialog.dismiss();
-                            if(response.getString("code").equals("0")) {
-                                Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
-                                return;
-                            }
-
                             user = User.build(response.optJSONObject("data"));
-                            GrifApp.getInstance().setCurrentUser(user);
+                            user.update();
+                            progressDialog.dismiss();
                             Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
                         } catch (JSONException e) {
                             e.printStackTrace();

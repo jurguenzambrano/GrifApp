@@ -1,5 +1,6 @@
 package pe.edu.upc.grifapp.activities;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -65,8 +66,8 @@ public class PromotionsActivity extends AppCompatActivity {
         });
         */
 
-        user = GrifApp.getInstance().getCurrentUser();
-        login = GrifApp.getInstance().getCurrentLogin();
+        user = ((GrifApp)getApplication()).getGrifAppService().getLastUser();
+        login = ((GrifApp)getApplication()).getGrifAppService().getLastLogin();
 
         sfiIndicadorRefresh = (SwipeRefreshLayout) findViewById(R.id.sfiIndicadorRefresh);
         sfiIndicadorRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -91,9 +92,14 @@ public class PromotionsActivity extends AppCompatActivity {
     }
 
     private void listPromotions() {
+        final ProgressDialog progressDialog = new ProgressDialog(PromotionsActivity.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Obteniendo promociones...");
+        progressDialog.show();
         AndroidNetworking.get(PromotionsApi.PROMOTIONS_URL)
                 .addHeaders("token",login.getToken())
-                .addHeaders("id",user.getId())
+                .addHeaders("id",user.getId().toString())
                 .setPriority(Priority.HIGH)
                 .setTag(TAG)
                 .build()
@@ -103,12 +109,13 @@ public class PromotionsActivity extends AppCompatActivity {
                         promotions = Promotion.build(response);
                         promotionsAdapter.setPromotions(promotions);
                         promotionsAdapter.notifyDataSetChanged();
+                        progressDialog.dismiss();
+                        sfiIndicadorRefresh.setRefreshing(false);
                     }
 
                     @Override
                     public void onError(ANError anError) {
                         Log.d(TAG, anError.getLocalizedMessage());
-
                     }
                 });
     }

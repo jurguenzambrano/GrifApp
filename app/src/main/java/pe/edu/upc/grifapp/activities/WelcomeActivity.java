@@ -14,15 +14,18 @@ import java.util.List;
 import pe.edu.upc.grifapp.GrifApp;
 import pe.edu.upc.grifapp.R;
 import pe.edu.upc.grifapp.models.Fuel;
+import pe.edu.upc.grifapp.models.Login;
 import pe.edu.upc.grifapp.models.User;
+import pe.edu.upc.grifapp.service.GrifAppService;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    TextView mHello;
-    TextView mWelcome;
-    ImageView imageViewPromotions;
-    ImageView imageViewLocations;
-    User user;
+    private TextView mHello;
+    private TextView mWelcome;
+    private ImageView imageViewPromotions;
+    private ImageView imageViewLocations;
+    private User user;
+    private Login login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +37,14 @@ public class WelcomeActivity extends AppCompatActivity {
         imageViewPromotions = (ImageView) findViewById(R.id.imageViewPromotions);
         imageViewLocations = (ImageView) findViewById(R.id.imageViewLocations);
 
-        user = GrifApp.getInstance().getCurrentUser();
+        user = ((GrifApp)getApplication()).getGrifAppService().getLastUser();
+        login = ((GrifApp)getApplication()).getGrifAppService().getLastLogin();
 
+        actualizaDashboard();
+
+    }
+
+    private void actualizaDashboard() {
         mHello.setText(getString(R.string.mHello) + " " + user.getName());
         mWelcome.setText(getString(R.string.mWelcome) + " " + getString(R.string.app_name));
 
@@ -52,7 +61,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 onViewPromotions();
             }
         });
-
     }
 
     public void onViewMap(){
@@ -73,13 +81,27 @@ public class WelcomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()){
             case R.id.opcionEditarCuenta:
-                Intent intent = new Intent(this, UserUpdateActivity.class);
+                intent = new Intent(this, UserUpdateActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.opcionCerrarSesion:
+                login.delete();
+                user.delete();
+                intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        actualizaDashboard();
     }
 }

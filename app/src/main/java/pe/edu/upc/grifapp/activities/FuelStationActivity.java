@@ -1,6 +1,7 @@
 package pe.edu.upc.grifapp.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -65,8 +66,8 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
 
         fuels = new ArrayList<Fuel>();
 
-        user = GrifApp.getInstance().getCurrentUser();
-        login = GrifApp.getInstance().getCurrentLogin();
+        user = ((GrifApp)getApplication()).getGrifAppService().getLastUser();
+        login = ((GrifApp)getApplication()).getGrifAppService().getLastLogin();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_container);
         mapFragment.getMapAsync(this);
@@ -77,10 +78,16 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
     public void onMapReady(final GoogleMap googleMap) {
         map = googleMap;
 
+        final ProgressDialog progressDialog = new ProgressDialog(FuelStationActivity.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Obteniendo estaciones de servicio...");
+        progressDialog.show();
+
         // Obtenemos todas las estaciones de servicio
         AndroidNetworking.get(FuelStationApi.FUEL_URL)
                 .addHeaders("token",login.getToken())
-                .addHeaders("id",user.getId())
+                .addHeaders("id",user.getId().toString())
                 .setPriority(Priority.HIGH)
                 .setTag(TAG)
                 .build()
@@ -98,11 +105,13 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
                                     .title(fuels.get(i).getName()));
                         }
                         setupLocationUpdates();
+                        progressDialog.dismiss();
                     }
 
                     @Override
                     public void onError(ANError anError) {
                         String messageError = "Error en aplicativo";
+                        progressDialog.dismiss();
                         try {
                             JSONObject jsonBody = new JSONObject(anError.getErrorBody());
                             messageError = jsonBody.getString("message");
@@ -144,7 +153,7 @@ public class FuelStationActivity extends AppCompatActivity implements OnMapReady
             locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
             location = locationManager.getLastKnownLocation(locationProvider);
             if (location == null){
-                Toast.makeText(this, "Error al obtener GPS", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error al obtener datos del GPS", Toast.LENGTH_LONG).show();
             }else {
                 refreshCurrentLocation(location);
             }

@@ -5,6 +5,10 @@
         android:title="Tu Cuenta"
         android:orderInCategory="100"/>
     <item
+        android:id="@+id/opcionCerrarSesion"
+        android:title="Cerrar Sesión"
+        android:orderInCategory="200"/>
+    <item
         android:id="@+id/opcionAcercaDe"
         android:title="Acerca de"
         android:orderInCategory="400"/>
