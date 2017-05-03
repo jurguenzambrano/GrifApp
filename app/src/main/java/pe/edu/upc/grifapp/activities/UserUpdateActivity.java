@@ -70,8 +70,8 @@ public class UserUpdateActivity extends AppCompatActivity {
 
         JSONObject dataUpdateUserJson = new JSONObject();
         try {
-            dataUpdateUserJson.put("last_name", txtName.getText().toString());
-            dataUpdateUserJson.put("email", txtLastName.getText().toString());
+            dataUpdateUserJson.put("name", txtName.getText().toString());
+            dataUpdateUserJson.put("last_name", txtLastName.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -85,11 +85,15 @@ public class UserUpdateActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            progressDialog.dismiss();
                             if(response.getString("code").equals("0")) {
                                 Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
+                                return;
                             }
+
                             user = User.build(response.optJSONObject("data"));
-                            progressDialog.dismiss();
+                            GrifApp.getInstance().setCurrentUser(user);
+                            Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                             return;
@@ -98,6 +102,7 @@ public class UserUpdateActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(ANError anError) {
+                        progressDialog.dismiss();
                         String messageError = "Error en aplicativo";
                         try {
                             JSONObject jsonBody = new JSONObject(anError.getErrorBody());
@@ -105,7 +110,6 @@ public class UserUpdateActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        progressDialog.dismiss();
                         Snackbar.make(coordinatorLayout, messageError, Snackbar.LENGTH_LONG).show();
                         return;
                     }
