@@ -259,6 +259,10 @@ public class WelcomeActivity extends AppCompatActivity implements LocationListen
                 startActivity(intent);
                 finish();
                 break;
+            case R.id.opcionAcercaDe:
+                intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
