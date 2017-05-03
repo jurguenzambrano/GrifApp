@@ -88,8 +88,8 @@ public class UserUpdateActivity extends AppCompatActivity {
                             if(response.getString("code").equals("0")) {
                                 Snackbar.make(coordinatorLayout, response.getString("message"), Snackbar.LENGTH_LONG).show();
                             }
-
                             user = User.build(response.optJSONObject("data"));
+                            progressDialog.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
                             return;
@@ -105,6 +105,7 @@ public class UserUpdateActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        progressDialog.dismiss();
                         Snackbar.make(coordinatorLayout, messageError, Snackbar.LENGTH_LONG).show();
                         return;
                     }
