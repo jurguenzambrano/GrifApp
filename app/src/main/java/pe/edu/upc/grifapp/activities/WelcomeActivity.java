@@ -110,7 +110,10 @@ public class WelcomeActivity extends AppCompatActivity implements LocationListen
         setupLocationUpdates();
 
         String url_weather = OpenWeatherMapApi.URL_OPENWEATHERMAP;
-
+        if (location == null){
+            Toast.makeText(this, "Error al obtener datos del GPS", Toast.LENGTH_LONG).show();
+            return;
+        }
         url_weather = url_weather.replace("LONGITUD",String.valueOf(location.getLongitude()));
         url_weather = url_weather.replace("LATITUD",String.valueOf(location.getLatitude()));
         Log.d("Test", "============== >" + url_weather);
